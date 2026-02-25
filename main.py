@@ -3,6 +3,8 @@ from models import AnalysisResult
 from database import Base
 from database import SessionLocal
 from models import AnalysisResult
+from dotenv import load_dotenv
+load_dotenv()
 
 
 Base.metadata.create_all(bind=engine)
@@ -18,20 +20,50 @@ app = FastAPI(title="Financial Document Analyzer")
 
 
 def run_crew(query: str, file_path: str):
-    financial_crew = Crew(
-        agents=[financial_analyst],
-        tasks=[analyze_financial_document],
-        process=Process.sequential,
-    )
-
-    result = financial_crew.kickoff(
-        {"query": query, "file_path": file_path}
-    )
-
-    # --- DB persistence (INSIDE function) ---
+    import os
     from database import SessionLocal
     from models import AnalysisResult
 
+    result = None
+
+    try:
+        # Try normal CrewAI execution
+        if os.getenv("OPENAI_API_KEY"):
+            financial_crew = Crew(
+                agents=[financial_analyst],
+                tasks=[analyze_financial_document],
+                process=Process.sequential,
+            )
+
+            result = financial_crew.kickoff(
+                {"query": query, "file_path": file_path}
+            )
+        else:
+            raise RuntimeError("No OPENAI_API_KEY set")
+
+    except Exception as crew_error:
+        # Graceful fallback (NO LLM dependency)
+        result = {
+            "summary": "LLM execution skipped or failed. Returned fallback analysis.",
+            "investment_recommendations": [
+                "Diversify investments across sectors.",
+                "Focus on long-term fundamentals.",
+                "Avoid excessive exposure to high-risk assets."
+            ],
+            "risk_assessment": [
+                "Market volatility risk",
+                "Economic uncertainty",
+                "Liquidity constraints"
+            ],
+            "market_insights": [
+                "Markets remain sensitive to macroeconomic signals.",
+                "Long-term growth outlook appears stable.",
+                "Short-term fluctuations are expected."
+            ],
+            "debug_note": str(crew_error)
+        }
+
+    # Persist result to database
     db = SessionLocal()
     try:
         record = AnalysisResult(
@@ -47,7 +79,6 @@ def run_crew(query: str, file_path: str):
         db.close()
 
     return result
-
 
 @app.get("/")
 async def root():
