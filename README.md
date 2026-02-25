@@ -1,38 +1,217 @@
-# Financial Document Analyzer - Debug Assignment
+<p align="center">
+  <img src="https://img.shields.io/badge/Assignment-VWO_GenAI_Debug-blue?style=flat-square" />
+  <img src="https://img.shields.io/badge/Status-Completed-success?style=flat-square" />
+</p>
+Financial Document Analyzer (CrewAI Debug Challenge)
 
-## Project Overview
-A comprehensive financial document analysis system that processes corporate reports, financial statements, and investment documents using AI-powered analysis agents.
+This repository contains my solution for the VWO – GenAI Engineering Intern Assignment.
 
-## Getting Started
+The objective of the assignment was to debug, stabilize, and modernize an existing CrewAI-based financial document analyzer, resolve runtime and dependency issues, and ensure the system works end-to-end. Optional bonus features such as database persistence were also implemented without breaking the original flow.
 
-### Install Required Libraries
-```sh
-pip install -r requirement.txt
-```
+Overview
 
-### Sample Document
-The system analyzes financial documents like Tesla's Q2 2025 financial update.
+The application:
 
-**To add Tesla's financial document:**
-1. Download the Tesla Q2 2025 update from: https://www.tesla.com/sites/default/files/downloads/TSLA-Q2-2025-Update.pdf
-2. Save it as `data/sample.pdf` in the project directory
-3. Or upload any financial PDF through the API endpoint
+Accepts a financial document (PDF) and a user query
 
-**Note:** Current `data/sample.pdf` is a placeholder - replace with actual Tesla financial document for proper testing.
+Uses CrewAI agents and tasks to analyze the document
 
-# You're All Not Set!
-🐛 **Debug Mode Activated!** The project has bugs waiting to be squashed - your mission is to fix them and bring it to life.
+Exposes functionality through a FastAPI backend
 
-## Debugging Instructions
+Returns AI-generated financial analysis
 
-1. **Identify the Bug**: Carefully read the code in each file and understand the expected behavior. There is a bug in each line of code. So be careful.
-2. **Fix the Bug**: Implement the necessary changes to fix the bug.
-3. **Test the Fix**: Run the project and verify that the bug is resolved.
-4. **Repeat**: Continue this process until all bugs are fixed.
+Persists analysis results in a database (bonus feature)
 
-## Expected Features
-- Upload financial documents (PDF format)
-- AI-powered financial analysis
-- Investment recommendations
-- Risk assessment
-- Market insights
+The original structure, function names, and execution flow from the assignment were preserved. Changes were strictly bug fixes, compatibility updates, and safe extensions.
+
+Bugs Identified and Fixes Applied
+1. CrewAI API Breaking Changes
+
+Problem
+Older imports such as:
+
+from crewai.agents import Agent
+
+caused runtime errors due to breaking API changes in newer CrewAI versions.
+
+Fix
+
+Updated imports to use the current CrewAI API
+
+Reworked agent initialization to satisfy updated Pydantic validation
+
+Ensured agents and tasks use valid schemas
+
+2. Tool Registration and Validation Errors
+
+Problem
+Tools were passed as raw functions, leading to errors like:
+
+ValidationError: Input should be a valid dictionary or instance of BaseTool
+
+Fix
+
+Converted tools into CrewAI-compatible tool definitions
+
+Ensured tools were registered in a format expected by agents and tasks
+
+Preserved original tool names and responsibilities
+
+3. Dependency and Version Conflicts
+
+Problem
+
+Conflicts between crewai, crewai-tools, litellm, openai, onnxruntime, and opentelemetry
+
+Python 3.14 incompatibility
+
+Fix
+
+Standardized runtime to Python 3.11
+
+Relaxed overly strict version pins
+
+Installed mutually compatible package versions
+
+Achieved stable dependency resolution
+
+4. FastAPI File Upload Failure
+
+Problem
+API crashed with:
+
+RuntimeError: Form data requires "python-multipart" to be installed
+
+Fix
+
+Added python-multipart as a dependency
+
+Verified multipart uploads using Swagger UI
+
+5. Crew Execution Context Bug
+
+Problem
+
+file_path was not passed to the Crew execution context
+
+PDF tools failed to access uploaded files
+
+Fix
+Updated crew kickoff input:
+
+financial_crew.kickoff({
+    "query": query,
+    "file_path": file_path
+})
+
+This ensured tools could reliably access the uploaded document.
+
+Setup Instructions
+1. Clone the Repository
+git clone https://github.com/Karma-tic/financial-document-analyzer.git
+cd financial-document-analyzer
+2. Create Virtual Environment (Python 3.11)
+python3.11 -m venv venv
+source venv/bin/activate
+3. Install Dependencies
+pip install -r requirements.txt
+4. (Optional) Set API Key
+export OPENAI_API_KEY="your_api_key_here"
+5. Run the Server
+uvicorn main:app --reload
+API Documentation
+
+Once running, open:
+
+http://127.0.0.1:8000/docs
+POST /analyze
+
+Request
+
+file: PDF file
+
+query: string
+
+Response
+
+{
+  "status": "success",
+  "query": "...",
+  "analysis": "...",
+  "file_processed": "filename.pdf"
+}
+Bonus Feature: Database Integration
+
+Implementation
+
+SQLite database using SQLAlchemy
+
+Results persisted without altering core CrewAI execution
+
+Stored Fields
+
+filename
+
+query
+
+generated_analysis
+
+timestamp
+
+Purpose
+
+Auditability
+
+Debug traceability
+
+Future analytics and retrieval
+
+Bonus Feature: Queue Worker Model (Design Notes)
+
+A full queue system was not implemented, but the system is designed to support:
+
+Celery + Redis
+
+FastAPI BackgroundTasks
+
+Recommended Architecture
+
+API → Queue → Worker → Crew Execution → Database
+
+This design would enable safe handling of concurrent requests at scale.
+
+Feature Coverage
+
+The system generates the following through CrewAI task design and prompting:
+
+Investment recommendations
+
+Risk assessment
+
+Market insights
+
+These are produced by the agent during analysis and do not require separate endpoints.
+
+Sample Test
+
+Use Swagger UI to upload a financial PDF, for example:
+
+File: TSLA-Q2-2025-Update.pdf
+
+Query: Analyze this financial document for investment insights
+
+Submission Notes
+
+This repository was prepared as part of the VWO GenAI Intern Debug Challenge.
+
+The focus was on:
+
+Debugging real production issues
+
+Handling breaking library changes
+
+Stabilizing AI agent execution
+
+Preserving original intent and structure
+
+Adding persistence without breaking flow
