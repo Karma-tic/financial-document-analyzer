@@ -1,0 +1,29 @@
+# ===== Core GenAI Framework =====
+crewai==0.130.0
+crewai-tools==0.47.1
+
+# ===== Web API =====
+fastapi==0.110.3
+uvicorn[standard]
+
+# ===== LLM stack (unpin – CrewAI controls versions) =====
+openai
+litellm
+tiktoken
+
+# ===== Vector / Storage (CrewAI compatible) =====
+chromadb>=0.5.23
+
+# ===== Utilities =====
+click
+pydantic
+protobuf
+numpy==1.26.4
+pandas==2.2.2
+pillow==10.3.0
+jsonschema==4.22.0
+oauthlib==3.2.2
+jinja2==3.1.4
+
+# ===== Optional PDF / file helpers =====
+onnxruntime
