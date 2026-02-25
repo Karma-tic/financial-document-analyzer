@@ -222,13 +222,3 @@ Preserving original intent and structure
 Adding persistence without breaking flow
 
 
----
-
-## Next (do this now)
-
-Commit the README:
-
-```bash
-git add README.md
-git commit -m "docs: add comprehensive README with bug fixes, setup, and design notes"
-git push
