@@ -1,6 +1,9 @@
 from database import engine
 from models import AnalysisResult
 from database import Base
+from database import SessionLocal
+from models import AnalysisResult
+
 
 Base.metadata.create_all(bind=engine)
 from fastapi import FastAPI, File, UploadFile, Form, HTTPException
@@ -79,6 +82,21 @@ async def analyze(
     finally:
         if os.path.exists(file_path):
             os.remove(file_path)
+@app.get("/history")
+def get_history():
+    db = SessionLocal()
+    records = db.query(AnalysisResult).all()
+    db.close()
+
+    return [
+        {
+            "id": r.id,
+            "filename": r.filename,
+            "query": r.query,
+            "created_at": r.created_at,
+        }
+        for r in records
+    ]
 
 
 if __name__ == "__main__":
