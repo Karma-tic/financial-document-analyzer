@@ -3,12 +3,14 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-from crewai import Agent
+from crewai import Agent, LLM
 
 from tools import search_tool, FinancialDocumentTool
 
 ### Loading LLM
-llm = llm
+llm = LLM(
+    model="gpt-4o-mini"
+)
 
 # Creating an Experienced Financial Analyst agent
 financial_analyst=Agent(
