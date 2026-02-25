@@ -173,12 +173,12 @@ A full queue system was not implemented, but the system is designed to support:
 Celery + Redis
 FastAPI BackgroundTasks
 
-###Recommended Architecture
+### Recommended Architecture
 
 API → Queue → Worker → Crew Execution → Database
 This design enables safe handling of concurrent requests at scale.
 
-###Feature Coverage
+### Feature Coverage
 
 Through CrewAI task design and prompting, the system produces:
 
