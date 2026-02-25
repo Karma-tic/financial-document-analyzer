@@ -21,7 +21,28 @@ def run_crew(query: str, file_path: str):
         process=Process.sequential,
     )
 
-    result = financial_crew.kickoff({"query": query, "file_path": file_path})
+    result = financial_crew.kickoff(
+        {"query": query, "file_path": file_path}
+    )
+
+    # --- DB persistence (INSIDE function) ---
+    from database import SessionLocal
+    from models import AnalysisResult
+
+    db = SessionLocal()
+    try:
+        record = AnalysisResult(
+            filename=file_path,
+            query=query,
+            result=str(result),
+        )
+        db.add(record)
+        db.commit()
+    except Exception as e:
+        print("DB write failed:", e)
+    finally:
+        db.close()
+
     return result
 
 
