@@ -47,12 +47,12 @@ Updated imports to use the current CrewAI API
 Reworked agent initialization to satisfy updated Pydantic validation
 
 Ensured agents and tasks use valid schemas
+```
+### 2. Tool Registration and Validation Errors
 
-2. Tool Registration and Validation Errors
-
-Problem
+**Problem**  
 Tools were passed as raw functions, leading to errors such as:
-
+```python
 ValidationError: Input should be a valid dictionary or instance of BaseTool
 
 Fix
@@ -62,13 +62,13 @@ Converted tools into CrewAI-compatible tool definitions
 Ensured tools were registered in a format expected by agents and tasks
 
 Preserved original tool names and responsibilities
+```
+### 3. Dependency and Version Conflicts
 
-3. Dependency and Version Conflicts
-
-Problem
+**Problem**  
 
 Conflicts between crewai, crewai-tools, litellm, openai, onnxruntime, and opentelemetry
-
+```python
 Python 3.14 incompatibility
 
 Fix
@@ -80,25 +80,25 @@ Relaxed overly strict version pins
 Installed mutually compatible package versions
 
 Achieved stable dependency resolution
+```
+### 4. FastAPI File Upload Failure
 
-4. FastAPI File Upload Failure
-
-Problem
+**Problem**  
 
 RuntimeError: Form data requires "python-multipart" to be installed
-
+```python
 Fix
 
 Added python-multipart as a dependency
 
 Verified multipart uploads using Swagger UI
+```
+### 5. Crew Execution Context Bug
 
-5. Crew Execution Context Bug
-
-Problem
+**Problem**  
 
 file_path was not passed to the Crew execution context
-
+```python
 PDF tools failed to access uploaded files
 
 Fix
@@ -110,7 +110,7 @@ financial_crew.kickoff({
 })
 
 This ensured tools could reliably access the uploaded document.
-
+```
 Setup Instructions
 1. Clone the Repository
 git clone https://github.com/Karma-tic/financial-document-analyzer.git
